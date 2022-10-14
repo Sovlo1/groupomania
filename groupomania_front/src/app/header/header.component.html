@@ -1,0 +1,17 @@
+<nav>
+    <span *ngIf="!(auth$ | async)" routerLink="/">
+        <img src="../../assets/images/icon-left-font-monochrome-white.svg" alt="logo de groupomania">
+    </span>
+    <span *ngIf="auth$ | async" routerLink="home">
+        <img src="../../assets/images/icon-left-font-monochrome-white.svg" alt="logo de groupomania">
+    </span>
+    <ul *ngIf="currentWindowWidth > 800">
+        <li class="btn btn-ternary" *ngIf="!(auth$ | async) && !(router.url === '/')" routerLink="signup">Inscription
+        </li>
+        <li class="btn btn-ternary" *ngIf=" !(auth$ | async) && !(router.url==='/' )" routerLink="login">Connexion</li>
+        <li class="btn btn-ternary" tabindex="0" (click)=" logout()" *ngIf="(auth$ | async)">Se
+            déconnecter</li>
+        <li class="btn btn-ternary" tabindex="0" *ngIf="(auth$ | async)" (click)="checkProfile()">
+            Votre profil</li>
+    </ul>
+</nav>

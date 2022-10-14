@@ -1,0 +1,14 @@
+.form-group {
+    color: var(--ternary);
+    &:first-child {
+        margin-top: 10vh;
+    }
+    margin: 5px auto;
+    padding: 0px 15px;
+    max-width: 400px;
+}
+
+label {
+    font-weight: 800;
+    font-size: 18px;
+}

@@ -1,0 +1,22 @@
+<div *ngIf="users$ | async as user" class="user-info-box">
+    <div class="d-flex nameBox">
+        <img src="{{user.profilePicUrl}}" onerror="this.src='../assets/images/defaultuser.png'">
+        <div class="text-ellipsis">
+            <h2 class="text-ellipsis">{{ user.firstName }} </h2>
+            <h3 class="text-ellipsis">{{ user.lastName }} </h3>
+        </div>
+    </div>
+    <ul *ngIf="currentWindowWidth <= 800">
+        <li class="btn btn-ternary d-flex" *ngIf="(auth$ | async)" (click)="checkProfile()"><i
+                class="fa-regular fa-id-badge"></i></li>
+        <li class="btn btn-ternary d-flex" (click)=" logout()" *ngIf="(auth$ | async)"><i
+                class="fa-solid fa-right-from-bracket"></i></li>
+
+    </ul>
+</div>
+<button *ngIf="currentWindowWidth > 800" class="btn btn-ternary" routerLink="new">
+    Poster un message!</button>
+<ul class="new-post" *ngIf="currentWindowWidth <= 800">
+    <li class="btn btn-white d-flex new-post new-post-mobile" routerLink="new"><i class="fa-regular fa-message"></i>
+    </li>
+</ul>

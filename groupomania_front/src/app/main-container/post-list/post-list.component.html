@@ -1,0 +1,126 @@
+<section *ngIf="posts$ | async as posts">
+    <div *ngFor="let post of posts;let i = index" class="posts">
+        <div class="posts__box">
+            <div class="posts__delete--confirm d-flex justify-center flex-align-center"
+                *ngIf="deleteThisPost && deleteIndex === i">
+                <div class="d-flex flex-column">
+                    <p>Etes vous certain de vouloir supprimer ce message? Cette action est irréversible!</p>
+                    <div class="d-flex">
+                        <button class="btn btn-ternary posts__delete--confirm--btn--left"
+                            (click)="confirmPostDelete()">Confirmer</button>
+                        <button class="btn btn-ternary posts__delete--confirm--btn--right"
+                            (click)="cancelPostDelete()">Annuler</button>
+                    </div>
+                </div>
+            </div>
+            <div class="posts__user">
+                <div class="d-flex flex-align-center posts__user--click" tabindex="0"
+                    (click)="goToThatProfile(post.User.id)">
+                    <img src="{{post.User.profilePicUrl || this.defaultProfilePicture}}"
+                        onerror="this.src='../assets/images/defaultuser.png'">
+                    <h2 class="overflow-wrap">{{ post.User.firstName}} {{ post.User.lastName}} </h2>
+                </div>
+                <div class="d-flex">
+                    <div *ngIf="id==post.UserId || isAdmin || isMod" class="delete__post"><i
+                            class="fa-solid fa-pen icon-edit" (click)="editPost(i)"></i>
+                    </div>
+                    <div *ngIf="id==post.UserId  || isAdmin || isMod" class="delete__post" (click)="deletePost(i)"><i
+                            class="fa-solid fa-trash  icon-edit"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="posts__content">
+                <h3 class="overflow-wrap" [innerHTML]="post.title! | linky"></h3>
+                <p class="overflow-wrap pre-wrap" [innerHTML]="post.content! | linky"></p>
+                <img (click)="postImage(i)" class="cursor-pointer" *ngIf="post.fileUrl !== null"
+                    src="{{ post.fileUrl }}" alt="">
+                <div class="d-flex justify-space-between posts__content__bottom" [ngClass]="{'flex-column': this.currentWindowWidth <= 800,
+                                'flex-align-center': this.currentWindowWidth > 800}">
+                    <div class="d-flex flex-align-center">
+                        <i [ngClass]="likeStatus(i)" class="fa-star icon-regular icon-hover cursor-pointer"
+                            (click)="likePost(i)"></i>
+                        <p>{{ post.Likes.length }} like(s)</p>
+                    </div>
+                    <div class="d-flex flex-column">
+                        <p class="date">Posté le {{ post.createdAt | date}}</p>
+                        <p class="date" *ngIf="post.createdAt !== post.updatedAt">(dernière édition le {{
+                            post.updatedAt | date }} )</p>
+                    </div>
+                </div>
+            </div>
+            <div *ngIf="post.Comments!.length>0">
+                <div class="posts__comments" *ngFor="let comment of post.Comments!;let index = index">
+                    <div class="posts__comments__delete--confirm d-flex justify-center flex-align-center"
+                        *ngIf="deleteThisComment && commentIndex === index && postIndex === i">
+                        <div class="d-flex flex-column">
+                            <p>Etes vous certain de vouloir supprimer ce commentaire? Cette action est irréversible!</p>
+                            <div class="d-flex">
+                                <button class="btn btn-ternary posts__delete--confirm--btn--left"
+                                    (click)="confirmCommentDelete()">Confirmer</button>
+                                <button class="btn btn-ternary posts__delete--confirm--btn--right"
+                                    (click)="cancelCommentDelete()">Annuler</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="comments">
+                        <div class="d-flex flex-align-center justify-space-between">
+                            <div class="d-flex flex-align-center comments__user--click overflow-wrap" tabindex="0"
+                                (click)="goToThatProfile(comment.User.id)">
+                                <img class="posts__comments__profile--image" src="{{comment.User.profilePicUrl}}"
+                                    onerror="this.src='../assets/images/defaultuser.png'">
+                                <h4>{{ comment.User.firstName }} {{ comment.User.lastName}} </h4>
+                            </div>
+                            <div *ngIf="id==comment.UserId || isAdmin || isMod" class="delete__comment"
+                                (click)="deleteComment(index, i)"><i class="fa-solid fa-trash icon-edit"></i>
+                            </div>
+                        </div>
+                        <p class="overflow-wrap pre-wrap" [innerHTML]="comment.content! | linky"></p>
+                        <img (click)="commentImage(index, i)" class="posts__comments__image cursor-pointer"
+                            *ngIf="comment.fileUrl !== null" src="{{ comment.fileUrl }}" alt="">
+                        <div class="d-flex flex-column">
+                            <p class="date">Posté le {{ comment.createdAt | date}}</p>
+                            <p class="date" *ngIf="comment.createdAt !== comment.updatedAt">(dernière édition le {{
+                                comment.updatedAt | date }} )</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <button class="btn btn-white" *ngIf="!newComment || commentIndex !== i" (click)="postComment(i)">Ajouter
+                un
+                commentaire</button>
+            <div *ngIf="newComment && commentIndex === i">
+                <form [formGroup]="newCommentForm" (ngSubmit)="submitComment()">
+                    <div class="form-group-new-post flex-center">
+                        <div class="d-flex justify-space-between">
+                            <label>Message</label>
+                            <div class="cursor-pointer" (click)="closeComment()"><i
+                                    class="fa-solid fa-xmark icon-edit"></i></div>
+                        </div>
+                        <input type="text" formControlName="content" id="comment"
+                            [ngClass]="{'border-invalid': newCommentForm.controls['content'].invalid && ((newCommentForm.controls['content'].dirty || newCommentForm.controls['content'].touched))}">
+                        <div *ngIf="newCommentForm.controls['content'].invalid && (newCommentForm.controls['content'].dirty || newCommentForm.controls['content'].touched)"
+                            class="alert-dark-bg">
+                            <div *ngIf="newCommentForm.controls['content'].errors?.['minlength']">Votre commentaire doit
+                                faire 2 caractères minimum</div>
+                            <div *ngIf="newCommentForm.controls['content'].errors?.['required']">Votre commentaire ne
+                                peut pas être vide</div>
+                        </div>
+                    </div>
+                    <div class="form-group-new-post flex-center d-flex flex-column">
+                        <div>
+                            <label for="comment-image-upload" class="cursor-pointer file-input"><i
+                                    class="fa-regular fa-image"></i>
+                                Ajouter une
+                                image</label>
+                            <input id="comment-image-upload" type="file" accept="image/*" (change)="newFile($event)">
+                        </div>
+                        <img [src]="this.image" *ngIf="this.image" class="file-view" />
+                    </div>
+                    <div class="alert-light-bg" *ngIf="error">{{errorLog}}</div>
+                    <button [disabled]="!newCommentForm.valid" [ngClass]="{'cursor-not-allowed': !newCommentForm.valid,
+                    'btn-disabled-light': !newCommentForm.valid}" class="btn btn-white">Envoyer!</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>

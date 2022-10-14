@@ -1,0 +1,33 @@
+nav {
+    display: flex;
+    justify-content: space-between;
+    background-color: white;
+    max-height: 80px;
+    width: 100%;
+    @media screen and (max-width: 800px) {
+        justify-content: center;
+    }
+    img {
+        padding: 3px 3px 3px 3px;
+        max-height: 100%;
+        max-width: 100%;
+        object-fit: cover;
+        &:hover {
+            cursor: pointer;
+        }
+    }
+}
+
+ul {
+    display: flex;
+    align-items: center;
+    li {
+        border-radius: 20px;
+        padding: 10px;
+        margin: 10px;
+        list-style-type: none;
+        &:hover {
+            cursor: pointer;
+        }
+    }
+}
